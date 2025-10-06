@@ -1,0 +1,12 @@
+package com.onclass.capacidad.infrastructure.adapters.persistenceadapter.repository;
+
+import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.entity.CapacidadEntity;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
+
+@Repository
+public interface CapacidadRepository extends ReactiveCrudRepository<CapacidadEntity, Long> {
+
+    Mono<CapacidadEntity> findByNombre(String nombre);
+}

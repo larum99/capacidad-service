@@ -1,0 +1,22 @@
+package com.onclass.capacidad.infrastructure.entrypoints.util;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class APIResponse {
+    private String code;       // Código de respuesta
+    private String message;    // Mensaje global
+    private String identifier; // messageId
+    private String date;       // Fecha
+    private List<ErrorDTO> errors; // Lista de errores
+}
