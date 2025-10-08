@@ -1,5 +1,6 @@
 package com.onclass.capacidad.infrastructure.adapters.persistenceadapter.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class CapacidadEntity {
     @Id
     private Long id;

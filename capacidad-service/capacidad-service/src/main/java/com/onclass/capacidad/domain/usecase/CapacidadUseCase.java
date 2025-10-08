@@ -2,11 +2,15 @@ package com.onclass.capacidad.domain.usecase;
 
 import com.onclass.capacidad.domain.api.CapacidadServicePort;
 import com.onclass.capacidad.domain.constants.Constants;
+import com.onclass.capacidad.domain.criteria.CapacidadCriteria;
 import com.onclass.capacidad.domain.enums.TechnicalMessage;
 import com.onclass.capacidad.domain.exceptions.BusinessException;
 import com.onclass.capacidad.domain.model.Capacidad;
 import com.onclass.capacidad.domain.spi.CapacidadPersistencePort;
 import com.onclass.capacidad.domain.spi.TecnologiaClientPort;
+import com.onclass.capacidad.domain.utils.PageResult;
+import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadListDTO;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
@@ -24,6 +28,7 @@ public class CapacidadUseCase implements CapacidadServicePort {
         this.tecnologiaClientPort = tecnologiaClientPort;
     }
 
+    // 🔹 HU1 - Registrar capacidad
     @Override
     public Mono<Capacidad> registrarCapacidad(Capacidad capacidad, String messageId) {
         if (capacidad.nombre() == null || capacidad.nombre().isBlank()) {
@@ -63,6 +68,41 @@ public class CapacidadUseCase implements CapacidadServicePort {
                             .flatMap(saved -> tecnologiaClientPort
                                     .associateCapacidadWithTecnologias(saved.id(), tecnologias)
                                     .thenReturn(saved)
+                            );
+                });
+    }
+
+    // 🔹 HU3 - Listar capacidades con tecnologías
+    @Override
+    public Mono<PageResult<CapacidadListDTO>> listarCapacidades(CapacidadCriteria criteria) {
+        return capacidadPersistencePort.findAll(criteria)
+                .flatMap(page -> {
+                    // ✅ usamos los getters correctos
+                    Flux<CapacidadListDTO> enrichedFlux = Flux.fromIterable(page.getContent())
+                            .flatMap(dto ->
+                                    tecnologiaClientPort.findTecnologiasByCapacidadId(dto.id())
+                                            .collectList()
+                                            .map(tecnologias ->
+                                                    new CapacidadListDTO(
+                                                            dto.id(),
+                                                            dto.nombre(),
+                                                            dto.descripcion(),
+                                                            tecnologias
+                                                    )
+                                            )
+                            );
+
+                    return enrichedFlux.collectList()
+                            .map(enrichedList ->
+                                    new PageResult<>(
+                                            enrichedList,
+                                            page.getTotalElements(),
+                                            page.getTotalPages(),
+                                            page.getCurrentPage(),
+                                            page.getPageSize(),
+                                            page.isFirst(),
+                                            page.isLast()
+                                    )
                             );
                 });
     }

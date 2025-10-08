@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -19,8 +20,10 @@ public class RouterRest {
     @Bean
     @CapacidadApiDoc
     public RouterFunction<ServerResponse> capacidadRoutes(CapacidadHandlerImpl handler) {
-        return route(POST(Constants.CAPACIDAD_PATH), handler::createCapacidad);
+        return route(POST(Constants.CAPACIDAD_PATH), handler::createCapacidad)
+                .andRoute(GET(Constants.CAPACIDAD_PATH), handler::getCapacidades);
     }
+
 
     @Bean
     @CapacidadBootcampApiDoc

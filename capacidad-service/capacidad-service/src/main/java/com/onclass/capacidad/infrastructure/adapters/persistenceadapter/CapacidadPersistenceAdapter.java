@@ -1,9 +1,14 @@
 package com.onclass.capacidad.infrastructure.adapters.persistenceadapter;
 
+import com.onclass.capacidad.domain.criteria.CapacidadCriteria;
 import com.onclass.capacidad.domain.model.Capacidad;
 import com.onclass.capacidad.domain.spi.CapacidadPersistencePort;
+import com.onclass.capacidad.domain.utils.PageResult;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.mapper.CapacidadEntityMapper;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.repository.CapacidadRepository;
+import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadListDTO;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Mono;
 
 public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
@@ -29,5 +34,29 @@ public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
                 .map(capacidadEntityMapper::toModel)
                 .map(c -> true)
                 .defaultIfEmpty(false);
+    }
+
+    @Override
+    public Mono<PageResult<CapacidadListDTO>> findAll(CapacidadCriteria criteria) {
+        return capacidadRepository.findAllByFilters(criteria)
+                .map(capacidadEntityMapper::toListDTO) // usa el mapper que devuelva CapacidadListDTO
+                .collectList()
+                .zipWith(capacidadRepository.countByFilters(criteria))
+                .map(tuple -> {
+                    long totalElements = tuple.getT2();
+                    int totalPages = (int) Math.ceil((double) totalElements / criteria.getSize());
+                    boolean isFirst = criteria.getPage() == 0;
+                    boolean isLast = criteria.getPage() == totalPages - 1;
+
+                    return new PageResult<>(
+                            tuple.getT1(),
+                            totalElements,
+                            totalPages,
+                            criteria.getPage(),
+                            criteria.getSize(),
+                            isFirst,
+                            isLast
+                    );
+                });
     }
 }
