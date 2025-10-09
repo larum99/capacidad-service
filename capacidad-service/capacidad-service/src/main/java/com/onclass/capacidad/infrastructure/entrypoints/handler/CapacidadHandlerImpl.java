@@ -5,9 +5,7 @@ import com.onclass.capacidad.domain.criteria.CapacidadCriteria;
 import com.onclass.capacidad.domain.enums.TechnicalMessage;
 import com.onclass.capacidad.domain.exceptions.BusinessException;
 import com.onclass.capacidad.domain.exceptions.TechnicalException;
-import com.onclass.capacidad.domain.utils.PageResult;
 import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadDTO;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadListDTO;
 import com.onclass.capacidad.infrastructure.entrypoints.mapper.CapacidadMapper;
 import com.onclass.capacidad.infrastructure.entrypoints.util.APIResponse;
 import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
@@ -40,9 +38,6 @@ public class CapacidadHandlerImpl {
         this.capacidadMapper = capacidadMapper;
     }
 
-    // ------------------------------
-    // ✅ EXISTENTE (no se modifica)
-    // ------------------------------
     public Mono<ServerResponse> createCapacidad(ServerRequest request) {
         String messageId = getMessageId(request);
 
@@ -58,38 +53,27 @@ public class CapacidadHandlerImpl {
                 .onErrorResume(ex -> handleErrors(ex, messageId));
     }
 
-    // ------------------------------
-    // 🆕 NUEVO MÉTODO - Listar capacidades
-    // ------------------------------
     public Mono<ServerResponse> getCapacidades(ServerRequest request) {
         String messageId = getMessageId(request);
 
-        // parámetros de consulta
         int page = parseQueryParam(request, "page", 0);
         int size = parseQueryParam(request, "size", 10);
         String sortBy = request.queryParam("sortBy").orElse("nombre");
-        String sortDirection = request.queryParam("sortDirection").orElse("asc");
 
-        // Construimos el criteria usando setters (compatible con tu clase)
+        String sortOrder = request.queryParam("sortOrder").orElse("asc");
+
         CapacidadCriteria criteria = new CapacidadCriteria();
         criteria.setPage(page);
         criteria.setSize(size);
         criteria.setSortBy(sortBy);
-        criteria.setSortOrder(sortDirection);
+        criteria.setSortOrder(sortOrder);
 
-        // Llamamos al service (usar el nombre correcto listarCapacidades)
         return capacidadServicePort.listarCapacidades(criteria)
-                // devolvemos directamente el PageResult en el body
                 .flatMap(pageResult -> ServerResponse.ok().bodyValue(pageResult))
-                // manejo de errores reutilizando tu helper
                 .onErrorResume(ex -> handleErrors(ex, messageId))
-                // agregamos el messageId al context (igual que en create)
                 .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId));
     }
 
-    // ------------------------------
-    // 🧩 Helpers compartidos
-    // ------------------------------
     private Mono<ServerResponse> handleErrors(Throwable ex, String messageId) {
         log.error("Error procesando solicitud con messageId: {}", messageId, ex);
 

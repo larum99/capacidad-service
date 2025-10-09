@@ -7,8 +7,6 @@ import com.onclass.capacidad.domain.utils.PageResult;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.mapper.CapacidadEntityMapper;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.repository.CapacidadRepository;
 import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadListDTO;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import reactor.core.publisher.Mono;
 
 public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
@@ -39,7 +37,7 @@ public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
     @Override
     public Mono<PageResult<CapacidadListDTO>> findAll(CapacidadCriteria criteria) {
         return capacidadRepository.findAllByFilters(criteria)
-                .map(capacidadEntityMapper::toListDTO) // usa el mapper que devuelva CapacidadListDTO
+                .map(capacidadEntityMapper::toListDTO)
                 .collectList()
                 .zipWith(capacidadRepository.countByFilters(criteria))
                 .map(tuple -> {

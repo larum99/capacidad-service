@@ -24,22 +24,15 @@ public class CustomCapacidadRepositoryImpl implements CustomCapacidadRepository 
                 FROM capacidades c
                 """);
 
-        // 🔹 En caso de que luego quieras filtrar por nombre
-        boolean hasFilter = false;
-        if (criteria.getSortBy() != null && criteria.getSortBy().equalsIgnoreCase("nombre")) {
-            sql.append("WHERE c.nombre IS NOT NULL ");
-            hasFilter = true;
+        if ("nombre".equalsIgnoreCase(criteria.getSortBy())) {
+            sql.append(" ORDER BY c.nombre ")
+                    .append(getValidSortOrder(criteria.getSortOrder()));
         }
 
-        // 🔹 Ordenamiento
-        sql.append("ORDER BY c.")
-                .append(criteria.getSortBy() != null ? criteria.getSortBy() : "nombre")
-                .append(" ")
-                .append(criteria.getSortOrder() != null ? criteria.getSortOrder() : "ASC");
-
-        // 🔹 Paginación
-        sql.append(" LIMIT ").append(criteria.getSize())
-                .append(" OFFSET ").append(criteria.getPage() * criteria.getSize());
+        if ("nombre".equalsIgnoreCase(criteria.getSortBy())) {
+            sql.append(" LIMIT ").append(criteria.getSize())
+                    .append(" OFFSET ").append(criteria.getPage() * criteria.getSize());
+        }
 
         return databaseClient.sql(sql.toString())
                 .map((row, metadata) -> {
@@ -54,16 +47,16 @@ public class CustomCapacidadRepositoryImpl implements CustomCapacidadRepository 
 
     @Override
     public Mono<Long> countByFilters(CapacidadCriteria criteria) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) AS total FROM capacidades c");
-
-        // 🔹 Si en el futuro se agrega un filtro por nombre, solo se añade aquí
-        // Ejemplo:
-        // if (criteria.getNombre() != null && !criteria.getNombre().isBlank()) {
-        //     sql.append(" WHERE LOWER(c.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))");
-        // }
-
-        return databaseClient.sql(sql.toString())
+        String sql = "SELECT COUNT(*) AS total FROM capacidades c";
+        return databaseClient.sql(sql)
                 .map((row, metadata) -> row.get("total", Long.class))
                 .one();
+    }
+
+    private String getValidSortOrder(String sortOrder) {
+        if (sortOrder != null && sortOrder.equalsIgnoreCase("desc")) {
+            return "DESC";
+        }
+        return "ASC";
     }
 }

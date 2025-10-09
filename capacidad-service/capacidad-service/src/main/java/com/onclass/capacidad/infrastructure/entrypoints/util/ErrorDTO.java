@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorDTO {
-    private String code;   // Código del error
+    private String code;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private String param;  // Campo asociado al error
-    private String message; // Mensaje legible
+    private String param;
+    private String message;
 }

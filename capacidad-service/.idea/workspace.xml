@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ee1a0624-37e5-4445-bd54-b1ccb715b053" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/capacidad-service/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/capacidad-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/domain/usecase/CapacidadUseCase.java" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/domain/usecase/CapacidadUseCase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/infrastructure/adapters/persistenceadapter/repository/impl/CustomCapacidadRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/infrastructure/adapters/persistenceadapter/repository/impl/CustomCapacidadRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/infrastructure/entrypoints/handler/CapacidadHandlerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/infrastructure/entrypoints/handler/CapacidadHandlerImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +35,8 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
-    "git-widget-placeholder": "feature/registrar-capacidades",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "feature/listar-capacidades",
     "last_opened_file_path": "C:/Users/laura.barona_pragma/Documents/Reto-reactivo/capacidad-service/capacidad-service"
   }
 }]]></component>

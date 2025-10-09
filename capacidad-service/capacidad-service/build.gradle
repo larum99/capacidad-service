@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.onclass'
@@ -50,4 +51,33 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacoco {
+	toolVersion = "0.8.8"
+}
+
+def coverageExcludes = [
+		'**/dto/**',
+		'**/spi/**',
+		'**/api/**',
+		'**/mappers/**',
+		'**/repository/**',
+		'**/*.test',
+		'**/generated/**'
+]
+
+tasks.jacocoTestReport {
+	dependsOn test
+	reports {
+		html.required.set(true)
+		xml.required.set(true)
+		csv.required.set(false)
+	}
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: coverageExcludes)
+		}))
+	}
 }
