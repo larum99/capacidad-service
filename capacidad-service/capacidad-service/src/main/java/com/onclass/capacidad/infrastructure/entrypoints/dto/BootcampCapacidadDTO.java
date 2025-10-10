@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CapacidadBootcampDTO {
-    private Long capacidadId;
+public class BootcampCapacidadDTO {
     private Long bootcampId;
+    private Long capacidadId;
 }

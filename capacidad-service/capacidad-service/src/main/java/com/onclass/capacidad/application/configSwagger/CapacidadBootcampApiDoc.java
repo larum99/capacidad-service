@@ -1,7 +1,7 @@
 package com.onclass.capacidad.application.configSwagger;
 
+import com.onclass.capacidad.infrastructure.entrypoints.dto.BootcampCapacidadDTO;
 import com.onclass.capacidad.infrastructure.entrypoints.handler.CapacidadBootcampHandlerImpl;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadBootcampDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -36,7 +36,7 @@ import java.lang.annotation.RetentionPolicy;
                         description = ApiConstants.REQUEST_BODY_CAPACIDAD_BOOTCAMP_DESCRIPTION,
                         required = true,
                         content = @Content(
-                                schema = @Schema(implementation = CapacidadBootcampDTO.class),
+                                schema = @Schema(implementation = BootcampCapacidadDTO.class),
                                 examples = {
                                         @ExampleObject(
                                                 name = "Ejemplo CapacidadBootcamp",
