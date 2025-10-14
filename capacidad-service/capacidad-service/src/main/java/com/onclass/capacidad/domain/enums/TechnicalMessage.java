@@ -5,8 +5,7 @@ public enum TechnicalMessage {
     // Errores genéricos
     INTERNAL_ERROR("500","Ha ocurrido un error interno, por favor intente nuevamente", ""),
     INVALID_REQUEST("400", "Solicitud incorrecta, por favor verifique los datos", ""),
-    INVALID_PARAMETERS("400-1", "Parámetros inválidos, por favor verifique los datos", ""),
-    INVALID_SORT_BY_PARAM("ERR-015", "Parámetro 'sortBy' inválido. Use 'nombre' o 'cantidadTecnologias'.", "sortBy"),
+    INVALID_PARAMETERS("400-1",  "Parámetro 'sortBy' inválido. Use 'nombre' o 'cantidadTecnologias'.", "sortBy"),
 
 
     // Mensajes específicos de Capacidad

@@ -4,6 +4,8 @@ import com.onclass.capacidad.domain.model.CapacidadBootcamp;
 import com.onclass.capacidad.domain.spi.CapacidadBootcampPersistencePort;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.mapper.CapacidadBootcampEntityMapper;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.repository.CapacidadBootcampRepository;
+import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadSummaryDTO;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class CapacidadBootcampPersistenceAdapter implements CapacidadBootcampPersistencePort {
@@ -21,5 +23,10 @@ public class CapacidadBootcampPersistenceAdapter implements CapacidadBootcampPer
     public Mono<CapacidadBootcamp> saveCapacidadBootcamp(CapacidadBootcamp relacion) {
         return repository.save(mapper.toEntity(relacion))
                 .map(mapper::toModel);
+    }
+
+    @Override
+    public Flux<CapacidadSummaryDTO> findCapacidadesByBootcampId(Long bootcampId) {
+        return repository.findCapacidadesByBootcampId(bootcampId);
     }
 }

@@ -5,7 +5,7 @@ public final class ApiConstants {
 
     // Rutas
     public static final String PATH_CAPACIDAD = "/capacidades";
-    public static final String PATH_CAPACIDAD_BOOTCAMP = "/capacidades/bootcamps";
+    public static final String PATH_CAPACIDAD_BOOTCAMP = "/capacidad-bootcamps";
 
 
     // Operaciones
