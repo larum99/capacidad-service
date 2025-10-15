@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ee1a0624-37e5-4445-bd54-b1ccb715b053" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/domain/usecase/CapacidadUseCase.java" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/domain/usecase/CapacidadUseCase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/infrastructure/adapters/persistenceadapter/repository/impl/CustomCapacidadRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/infrastructure/adapters/persistenceadapter/repository/impl/CustomCapacidadRepositoryImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/infrastructure/entrypoints/handler/CapacidadHandlerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/infrastructure/entrypoints/handler/CapacidadHandlerImpl.java" afterDir="false" />
-    </list>
+    <list default="true" id="ee1a0624-37e5-4445-bd54-b1ccb715b053" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,7 +32,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/listar-capacidades",
+    "git-widget-placeholder": "develop",
     "last_opened_file_path": "C:/Users/laura.barona_pragma/Documents/Reto-reactivo/capacidad-service/capacidad-service"
   }
 }]]></component>
