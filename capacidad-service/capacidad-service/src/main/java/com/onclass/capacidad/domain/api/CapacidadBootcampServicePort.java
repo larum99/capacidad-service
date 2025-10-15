@@ -2,13 +2,13 @@ package com.onclass.capacidad.domain.api;
 
 import com.onclass.capacidad.domain.model.Capacidad;
 import com.onclass.capacidad.domain.model.CapacidadBootcamp;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadSummaryDTO;
+import com.onclass.capacidad.domain.model.CapacidadSummary;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
 
 public interface CapacidadBootcampServicePort {
     Flux<CapacidadBootcamp> registrarCapacidadBootcamps(List<CapacidadBootcamp> relaciones, String messageId);
-    Flux<CapacidadSummaryDTO> listarCapacidadesPorBootcamp(Long bootcampId);
+    Flux<CapacidadSummary> listarCapacidadesPorBootcamp(Long bootcampId);
 }
 
