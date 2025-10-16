@@ -6,10 +6,11 @@ import com.onclass.capacidad.domain.criteria.CapacidadCriteria;
 import com.onclass.capacidad.domain.enums.TechnicalMessage;
 import com.onclass.capacidad.domain.exceptions.BusinessException;
 import com.onclass.capacidad.domain.model.Capacidad;
+import com.onclass.capacidad.domain.model.CapacidadConTecnologias;
 import com.onclass.capacidad.domain.spi.CapacidadPersistencePort;
 import com.onclass.capacidad.domain.spi.TecnologiaClientPort;
 import com.onclass.capacidad.domain.utils.PageResult;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadListDTO;
+import com.onclass.capacidad.domain.utils.TecnologiaSummary;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -44,6 +45,7 @@ public class CapacidadUseCase implements CapacidadServicePort {
         if (capacidad.descripcion().length() > Constants.MAX_DESCRIPCION_CAPACIDAD) {
             return Mono.error(new BusinessException(TechnicalMessage.CAPACIDAD_DESCRIPCION_TOO_LONG));
         }
+
         List<Long> tecnologias = capacidad.tecnologias();
         if (tecnologias == null || tecnologias.size() < Constants.MIN_TECNOLOGIAS) {
             return Mono.error(new BusinessException(TechnicalMessage.CAPACIDAD_MIN_TECNOLOGIAS));
@@ -51,25 +53,27 @@ public class CapacidadUseCase implements CapacidadServicePort {
         if (tecnologias.size() > Constants.MAX_TECNOLOGIAS) {
             return Mono.error(new BusinessException(TechnicalMessage.CAPACIDAD_MAX_TECNOLOGIAS));
         }
+
         Set<Long> set = new HashSet<>(tecnologias);
         if (set.size() != tecnologias.size()) {
             return Mono.error(new BusinessException(TechnicalMessage.CAPACIDAD_TECNOLOGIAS_DUPLICADAS));
         }
+
         return capacidadPersistencePort.existByNombre(capacidad.nombre())
                 .flatMap(exists -> {
                     if (exists) {
                         return Mono.error(new BusinessException(TechnicalMessage.CAPACIDAD_ALREADY_EXISTS));
                     }
                     return capacidadPersistencePort.saveCapacidad(capacidad)
-                            .flatMap(saved -> tecnologiaClientPort
-                                    .associateCapacidadWithTecnologias(saved.id(), tecnologias)
-                                    .thenReturn(saved)
+                            .flatMap(saved ->
+                                    tecnologiaClientPort.associateCapacidadWithTecnologias(saved.id(), tecnologias)
+                                            .thenReturn(saved)
                             );
                 });
     }
 
     @Override
-    public Mono<PageResult<CapacidadListDTO>> listarCapacidades(CapacidadCriteria criteria) {
+    public Mono<PageResult<CapacidadConTecnologias>> listarCapacidades(CapacidadCriteria criteria) {
         String sortBy = Optional.ofNullable(criteria.getSortBy()).orElse(Constants.SORT_BY_NOMBRE);
 
         switch (sortBy.toLowerCase()) {
@@ -82,41 +86,50 @@ public class CapacidadUseCase implements CapacidadServicePort {
         }
     }
 
-    private Mono<PageResult<CapacidadListDTO>> sortByName(CapacidadCriteria criteria) {
+    private Mono<PageResult<CapacidadConTecnologias>> sortByName(CapacidadCriteria criteria) {
         return capacidadPersistencePort.findAll(criteria)
                 .flatMap(page -> {
-                    Flux<CapacidadListDTO> enrichedFlux = Flux.fromIterable(page.getContent())
-                            .concatMap(dto ->
-                                    tecnologiaClientPort.findTecnologiasByCapacidadId(dto.id())
+                    Flux<CapacidadConTecnologias> enrichedFlux = Flux.fromIterable(page.getContent())
+                            .concatMap(capacidad ->
+                                    tecnologiaClientPort.findTecnologiasByCapacidadId(capacidad.id())
                                             .collectList()
-                                            .map(tecnologias -> new CapacidadListDTO(dto.id(), dto.nombre(), dto.descripcion(), tecnologias))
+                                            .map(tecnologias -> new CapacidadConTecnologias(
+                                                    capacidad.id(),
+                                                    capacidad.nombre(),
+                                                    capacidad.descripcion(),
+                                                    tecnologias // List<TecnologiaSummary>
+                                            ))
                             );
 
                     return enrichedFlux.collectList()
-                            .map(enrichedList -> new PageResult<>(
-                                            enrichedList,
-                                            page.getTotalElements(),
-                                            page.getTotalPages(),
-                                            page.getCurrentPage(),
-                                            page.getPageSize(),
-                                            page.isFirst(),
-                                            page.isLast()
-                                    )
-                            );
+                            .map(list -> new PageResult<>(
+                                    list,
+                                    page.getTotalElements(),
+                                    page.getTotalPages(),
+                                    page.getCurrentPage(),
+                                    page.getPageSize(),
+                                    page.isFirst(),
+                                    page.isLast()
+                            ));
                 });
     }
 
-    private Mono<PageResult<CapacidadListDTO>> sortByTechnologyCount(CapacidadCriteria criteria) {
+    private Mono<PageResult<CapacidadConTecnologias>> sortByTechnologyCount(CapacidadCriteria criteria) {
         return capacidadPersistencePort.findAll(criteria)
-                .flatMapMany(pageResult -> Flux.fromIterable(pageResult.getContent()))
-                .concatMap(dto ->
-                        tecnologiaClientPort.findTecnologiasByCapacidadId(dto.id())
+                .flatMapMany(page -> Flux.fromIterable(page.getContent()))
+                .concatMap(capacidad ->
+                        tecnologiaClientPort.findTecnologiasByCapacidadId(capacidad.id())
                                 .collectList()
-                                .map(tecnologias -> new CapacidadListDTO(dto.id(), dto.nombre(), dto.descripcion(), tecnologias))
+                                .map(tecnologias -> new CapacidadConTecnologias(
+                                        capacidad.id(),
+                                        capacidad.nombre(),
+                                        capacidad.descripcion(),
+                                        tecnologias // List<TecnologiaSummary>
+                                ))
                 )
                 .collectList()
                 .flatMap(fullList -> {
-                    Comparator<CapacidadListDTO> comparator = Comparator.comparingInt(c -> c.tecnologias().size());
+                    Comparator<CapacidadConTecnologias> comparator = Comparator.comparingInt(c -> c.tecnologias().size());
                     if (Constants.SORT_ORDER_DESC.equalsIgnoreCase(criteria.getSortOrder())) {
                         comparator = comparator.reversed();
                     }
@@ -141,7 +154,7 @@ public class CapacidadUseCase implements CapacidadServicePort {
                     }
 
                     int toIndex = Math.min(fromIndex + size, totalElements);
-                    List<CapacidadListDTO> paginatedList = fullList.subList(fromIndex, toIndex);
+                    List<CapacidadConTecnologias> paginatedList = fullList.subList(fromIndex, toIndex);
 
                     return Mono.just(new PageResult<>(
                             paginatedList,

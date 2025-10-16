@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ee1a0624-37e5-4445-bd54-b1ccb715b053" name="Changes" comment="" />
+    <list default="true" id="ee1a0624-37e5-4445-bd54-b1ccb715b053" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/domain/usecase/CapacidadBootcampUseCase.java" beforeDir="false" afterPath="$PROJECT_DIR$/capacidad-service/src/main/java/com/onclass/capacidad/domain/usecase/CapacidadBootcampUseCase.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,7 +34,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "develop",
+    "git-widget-placeholder": "feature/eliminar-bootcamp",
     "last_opened_file_path": "C:/Users/laura.barona_pragma/Documents/Reto-reactivo/capacidad-service/capacidad-service"
   }
 }]]></component>
