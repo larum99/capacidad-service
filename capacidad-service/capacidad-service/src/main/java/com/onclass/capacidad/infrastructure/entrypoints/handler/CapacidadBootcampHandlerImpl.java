@@ -61,6 +61,30 @@ public class CapacidadBootcampHandlerImpl {
                 .onErrorResume(ex -> buildErrorResponse(messageId, ex));
     }
 
+    public Mono<ServerResponse> deleteCapacidadesByBootcamp(ServerRequest request) {
+        String messageId = getMessageId(request);
+        Long bootcampId = Long.valueOf(request.pathVariable("bootcampId"));
+
+        return servicePort
+                .eliminarCapacidadesPorBootcamp(bootcampId, messageId)
+                .then(ServerResponse.noContent().build())
+                .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
+                .doOnSuccess(r -> log.info("Capacidades eliminadas para bootcamp {}", bootcampId))
+                .doOnError(ex -> log.error("Error al eliminar capacidades del bootcamp {}", bootcampId, ex))
+                .onErrorResume(ex -> buildErrorResponse(messageId, ex));
+    }
+
+    public Mono<ServerResponse> countBootcampsByCapacidadId(ServerRequest request) {
+        String messageId = getMessageId(request);
+        Long capacidadId = Long.valueOf(request.pathVariable("capacidadId"));
+
+        return servicePort.countBootcampsByCapacidadId(capacidadId)
+                .flatMap(count -> ServerResponse.ok().bodyValue(count))
+                .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
+                .doOnError(ex -> log.error("Error al contar bootcamps para capacidad {}: {}", capacidadId, ex.getMessage()))
+                .onErrorResume(ex -> buildErrorResponse(messageId, ex));
+    }
+
     private Mono<ServerResponse> buildErrorResponse(String messageId, Throwable ex) {
         if (ex instanceof BusinessException bex) {
             return buildError(HttpStatus.BAD_REQUEST, messageId, bex.getTechnicalMessage());

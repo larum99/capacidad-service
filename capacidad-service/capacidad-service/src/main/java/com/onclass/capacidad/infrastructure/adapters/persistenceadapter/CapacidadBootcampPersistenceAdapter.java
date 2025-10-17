@@ -8,6 +8,8 @@ import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.reposito
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 public class CapacidadBootcampPersistenceAdapter implements CapacidadBootcampPersistencePort {
 
     private final CapacidadBootcampRepository repository;
@@ -19,6 +21,8 @@ public class CapacidadBootcampPersistenceAdapter implements CapacidadBootcampPer
         this.mapper = mapper;
     }
 
+    // ... (los otros métodos como save, find, etc., permanecen igual) ...
+
     @Override
     public Mono<CapacidadBootcamp> saveCapacidadBootcamp(CapacidadBootcamp relacion) {
         return repository.save(mapper.toEntity(relacion))
@@ -27,13 +31,43 @@ public class CapacidadBootcampPersistenceAdapter implements CapacidadBootcampPer
 
     @Override
     public Flux<Capacidad> findCapacidadesByBootcampId(Long bootcampId) {
-        // Solo devuelve Capacidad sin preocuparse por tecnologías
         return repository.findCapacidadesByBootcampId(bootcampId)
                 .map(entity -> new Capacidad(
                         entity.getId(),
                         entity.getNombre(),
                         entity.getDescripcion(),
-                        null // tecnologías se gestionan en UseCase vía TecnologiaClientPort
+                        null
                 ));
+    }
+
+    @Override
+    public Mono<List<CapacidadBootcamp>> findCapacidadesBootcampByBootcampId(Long bootcampId) {
+        return repository.findByBootcampId(bootcampId)
+                .map(mapper::toModel)
+                .collectList();
+    }
+
+    @Override
+    public Mono<Integer> countBootcampsByCapacidadId(Long capacidadId) {
+        return repository.countByCapacidadId(capacidadId)
+                .map(Long::intValue);
+    }
+
+    /**
+     * Implementación en dos pasos para compatibilidad con MySQL.
+     */
+    @Override
+    public Mono<List<Long>> deleteByBootcampId(Long bootcampId) {
+        // PASO 1: Obtener la lista de IDs de capacidad que se van a eliminar.
+        return repository.findCapacidadIdsByBootcampId(bootcampId)
+                .collectList()
+                .flatMap(capacidadIds -> {
+                    if (capacidadIds.isEmpty()) {
+                        return Mono.just(capacidadIds); // No hay nada que borrar, devuelve la lista vacía.
+                    }
+                    // PASO 2: Ejecutar el borrado y, cuando termine, devolver la lista de IDs que obtuvimos en el paso 1.
+                    return repository.deleteAllByBootcampId(bootcampId)
+                            .thenReturn(capacidadIds);
+                });
     }
 }

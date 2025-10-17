@@ -58,4 +58,12 @@ public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
                     );
                 });
     }
+
+    // ========== MÉTODO NUEVO IMPLEMENTADO ==========
+
+    @Override
+    public Mono<Void> deleteByIds(List<Long> capacidadIds) {
+        // Delega la operación de borrado masivo directamente al repositorio
+        return capacidadRepository.deleteByIds(capacidadIds);
+    }
 }

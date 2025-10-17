@@ -9,8 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
+import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 @Configuration
@@ -42,5 +41,24 @@ public class RouterRest {
     public RouterFunction<ServerResponse> getCapacidadesByBootcamp(CapacidadBootcampHandlerImpl handler) {
         return route(GET(ApiConstants.PATH_CAPACIDAD_BOOTCAMP + "/{bootcampId}/capacidades"),
                 handler::listCapacidadesByBootcamp);
+    }
+
+    @Bean
+    //@CapacidadBootcampDeleteApiDoc
+    public RouterFunction<ServerResponse> deleteCapacidadesByBootcamp(CapacidadBootcampHandlerImpl handler) {
+        return route(DELETE(ApiConstants.PATH_CAPACIDAD_BOOTCAMP + "/{bootcampId}"),
+                handler::deleteCapacidadesByBootcamp);
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> countBootcampsByCapacidadRoute(CapacidadBootcampHandlerImpl handler) {
+        return route(GET(Constants.CAPACIDAD_PATH + "/{capacidadId}/bootcamps/count"),
+                handler::countBootcampsByCapacidadId);
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> deleteCapacidadesByIdsRoute(CapacidadHandlerImpl handler) {
+        return route(DELETE(Constants.CAPACIDAD_PATH),
+                handler::deleteCapacidadesByIds);
     }
 }

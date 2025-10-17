@@ -86,6 +86,11 @@ public class CapacidadUseCase implements CapacidadServicePort {
         }
     }
 
+    @Override
+    public Mono<Void> eliminarCapacidadesPorIds(List<Long> capacidadIds) {
+        return capacidadPersistencePort.deleteByIds(capacidadIds);
+    }
+
     private Mono<PageResult<CapacidadConTecnologias>> sortByName(CapacidadCriteria criteria) {
         return capacidadPersistencePort.findAll(criteria)
                 .flatMap(page -> {
