@@ -28,17 +28,9 @@ public interface CapacidadBootcampRepository extends ReactiveCrudRepository<Capa
     """)
     Flux<CapacidadEntity> findCapacidadesByBootcampId(Long bootcampId);
 
-    // ========== MÉTODOS MODIFICADOS PARA COMPATIBILIDAD CON MYSQL ==========
-
-    /**
-     * PASO 1: Busca los IDs de capacidad que serán eliminados.
-     */
     @Query("SELECT id_capacidad FROM capacidad_bootcamp WHERE id_bootcamp = :bootcampId")
     Flux<Long> findCapacidadIdsByBootcampId(Long bootcampId);
 
-    /**
-     * PASO 2: Elimina las relaciones para un bootcampId.
-     */
     @Modifying
     @Query("DELETE FROM capacidad_bootcamp WHERE id_bootcamp = :bootcampId")
     Mono<Void> deleteAllByBootcampId(Long bootcampId);

@@ -14,12 +14,7 @@ public interface CapacidadRepository extends ReactiveCrudRepository<CapacidadEnt
 
     Mono<CapacidadEntity> findByNombre(String nombre);
 
-    // ========== MÉTODO NUEVO AÑADIDO ==========
-
-    /**
-     * Elimina todas las capacidades que coincidan con la lista de IDs proporcionada.
-     */
-    @Modifying // 👈 Esencial para que Spring Data ejecute la modificación
+    @Modifying
     @Query("DELETE FROM capacidades WHERE id IN (:capacidadIds)")
     Mono<Void> deleteByIds(List<Long> capacidadIds);
 }
