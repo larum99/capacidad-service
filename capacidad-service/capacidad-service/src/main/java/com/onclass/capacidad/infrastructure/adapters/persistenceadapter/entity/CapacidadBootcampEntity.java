@@ -1,5 +1,6 @@
 package com.onclass.capacidad.infrastructure.adapters.persistenceadapter.entity;
 
+import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.util.EntityConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table(name = "capacidad_bootcamp")
+@Table(name = EntityConstants.TABLE_CAPACIDAD_BOOTCAMP)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,10 +19,10 @@ public class CapacidadBootcampEntity {
     @Id
     private Long id;
 
-    @Column("id_capacidad")
+    @Column(EntityConstants.COLUMN_ID_CAPACIDAD)
     private Long capacidadId;
 
-    @Column("id_bootcamp")
+    @Column(EntityConstants.COLUMN_ID_BOOTCAMP)
     private Long bootcampId;
 }
 

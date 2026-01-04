@@ -8,7 +8,7 @@ import com.onclass.capacidad.domain.model.Capacidad;
 import com.onclass.capacidad.domain.spi.CapacidadPersistencePort;
 import com.onclass.capacidad.domain.spi.TecnologiaClientPort;
 import com.onclass.capacidad.domain.utils.PageResult;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadListDTO;
+import com.onclass.capacidad.domain.utils.TecnologiaSummary;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,8 +39,8 @@ class CapacidadUseCaseTest {
     private CapacidadUseCase capacidadUseCase;
 
     private Capacidad capacidadValida;
-    private CapacidadListDTO dto1;
-    private CapacidadListDTO dto2;
+    private Capacidad capacidad1;
+    private Capacidad capacidad2;
 
     @BeforeEach
     void setUp() {
@@ -53,16 +53,18 @@ class CapacidadUseCaseTest {
                 List.of(1L, 2L, 3L)
         );
 
-        dto1 = new CapacidadListDTO(1L, "Backend", "Microservicios", List.of());
-        dto2 = new CapacidadListDTO(2L, "Frontend", "React y Angular", List.of());
+        capacidad1 = new Capacidad(1L, "Backend", "Microservicios", List.of(1L, 2L));
+        capacidad2 = new Capacidad(2L, "Frontend", "React y Angular", List.of(3L));
     }
 
     @Test
     void registrarCapacidad_exito() {
+        // Arrange
         when(capacidadPersistencePort.existByNombre(anyString())).thenReturn(Mono.just(false));
         when(capacidadPersistencePort.saveCapacidad(any(Capacidad.class))).thenReturn(Mono.just(capacidadValida));
         when(tecnologiaClientPort.associateCapacidadWithTecnologias(anyLong(), anyList())).thenReturn(Mono.empty());
 
+        // Act & Assert
         StepVerifier.create(capacidadUseCase.registrarCapacidad(capacidadValida, "msg-123"))
                 .expectNext(capacidadValida)
                 .verifyComplete();
@@ -70,8 +72,13 @@ class CapacidadUseCaseTest {
 
     @Test
     void registrarCapacidad_nombreRequerido() {
+        // Arrange
         Capacidad invalida = new Capacidad(1L, " ", "desc", List.of(1L, 2L, 3L));
+        when(capacidadPersistencePort.existByNombre(anyString())).thenReturn(Mono.just(false));
+        when(capacidadPersistencePort.saveCapacidad(any(Capacidad.class))).thenReturn(Mono.just(invalida));
+        when(tecnologiaClientPort.associateCapacidadWithTecnologias(anyLong(), anyList())).thenReturn(Mono.empty());
 
+        // Act & Assert
         StepVerifier.create(capacidadUseCase.registrarCapacidad(invalida, "msg"))
                 .expectErrorMatches(e -> e instanceof BusinessException &&
                         ((BusinessException) e).getMessage().equals(TechnicalMessage.CAPACIDAD_NOMBRE_REQUIRED.getDescription()))
@@ -80,9 +87,14 @@ class CapacidadUseCaseTest {
 
     @Test
     void registrarCapacidad_masDeVeinteTecnologias() {
+        // Arrange
         List<Long> muchas = LongStream.range(1, 25).boxed().toList();
         Capacidad invalida = new Capacidad(1L, "Capacidad", "desc", muchas);
+        when(capacidadPersistencePort.existByNombre(anyString())).thenReturn(Mono.just(false));
+        when(capacidadPersistencePort.saveCapacidad(any(Capacidad.class))).thenReturn(Mono.just(invalida));
+        when(tecnologiaClientPort.associateCapacidadWithTecnologias(anyLong(), anyList())).thenReturn(Mono.empty());
 
+        // Act & Assert
         StepVerifier.create(capacidadUseCase.registrarCapacidad(invalida, "msg"))
                 .expectErrorMatches(e -> e instanceof BusinessException &&
                         ((BusinessException) e).getMessage().equals(TechnicalMessage.CAPACIDAD_MAX_TECNOLOGIAS.getDescription()))
@@ -91,25 +103,23 @@ class CapacidadUseCaseTest {
 
     @Test
     void listarCapacidades_ordenPorNombre_exito() {
-        PageResult<CapacidadListDTO> page = new PageResult<>(List.of(dto1, dto2), 2L, 1, 0, 10, true, true);
-
-        when(capacidadPersistencePort.findAll(any(CapacidadCriteria.class))).thenReturn(Mono.just(page));
-        when(tecnologiaClientPort.findTecnologiasByCapacidadId(anyLong()))
-                .thenAnswer(invocation -> {
-                    Long id = invocation.getArgument(0);
-                    if (id == 1L) {
-                        return Flux.just(1L, 2L);
-                    } else if (id == 2L) {
-                        return Flux.just(3L);
-                    }
-                    return Flux.empty();
-                });
-
+        // Arrange
+        PageResult<Capacidad> page = new PageResult<>(List.of(capacidad1, capacidad2), 2L, 1, 0, 10, true, true);
         CapacidadCriteria criteria = new CapacidadCriteria();
         criteria.setSortBy(Constants.SORT_BY_NOMBRE);
         criteria.setPage(0);
         criteria.setSize(10);
 
+        when(capacidadPersistencePort.findAll(any(CapacidadCriteria.class))).thenReturn(Mono.just(page));
+        when(tecnologiaClientPort.findTecnologiasByCapacidadId(1L))
+                .thenReturn(Flux.just(
+                        new TecnologiaSummary(1L, "Java"),
+                        new TecnologiaSummary(2L, "Spring")
+                ));
+        when(tecnologiaClientPort.findTecnologiasByCapacidadId(2L))
+                .thenReturn(Flux.just(new TecnologiaSummary(3L, "React")));
+
+        // Act & Assert
         StepVerifier.create(capacidadUseCase.listarCapacidades(criteria))
                 .expectNextMatches(result -> result.getContent().size() == 2 &&
                         result.getContent().get(0).id() == 1L &&
@@ -122,27 +132,25 @@ class CapacidadUseCaseTest {
 
     @Test
     void listarCapacidades_ordenPorCantidadTecnologias_descendente() {
-        PageResult<CapacidadListDTO> page = new PageResult<>(List.of(dto1, dto2), 2L, 1, 0, 10, true, true);
-
-        when(capacidadPersistencePort.findAll(any(CapacidadCriteria.class))).thenReturn(Mono.just(page));
-        when(tecnologiaClientPort.findTecnologiasByCapacidadId(anyLong()))
-                .thenAnswer(invocation -> {
-                    Long id = invocation.getArgument(0);
-                    if (id == 1L) {
-                        return Flux.just(1L, 2L, 3L);
-                    } else if (id == 2L) {
-                        return Flux.just(1L);
-                    }
-                    return Flux.empty();
-                });
-
-
+        // Arrange
+        PageResult<Capacidad> page = new PageResult<>(List.of(capacidad1, capacidad2), 2L, 1, 0, 10, true, true);
         CapacidadCriteria criteria = new CapacidadCriteria();
         criteria.setSortBy(Constants.SORT_BY_CANTIDAD_TECNOLOGIAS);
         criteria.setSortOrder(Constants.SORT_ORDER_DESC);
         criteria.setPage(0);
         criteria.setSize(10);
 
+        when(capacidadPersistencePort.findAll(any(CapacidadCriteria.class))).thenReturn(Mono.just(page));
+        when(tecnologiaClientPort.findTecnologiasByCapacidadId(1L))
+                .thenReturn(Flux.just(
+                        new TecnologiaSummary(1L, "Java"),
+                        new TecnologiaSummary(2L, "Spring"),
+                        new TecnologiaSummary(3L, "WebFlux")
+                ));
+        when(tecnologiaClientPort.findTecnologiasByCapacidadId(2L))
+                .thenReturn(Flux.just(new TecnologiaSummary(4L, "React")));
+
+        // Act & Assert
         StepVerifier.create(capacidadUseCase.listarCapacidades(criteria))
                 .expectNextMatches(result -> result.getContent().get(0).id() == 1L &&
                         result.getContent().get(1).id() == 2L
@@ -152,12 +160,37 @@ class CapacidadUseCaseTest {
 
     @Test
     void listarCapacidades_parametroSortInvalido() {
+        // Arrange
         CapacidadCriteria criteria = new CapacidadCriteria();
         criteria.setSortBy("invalido");
 
+        // Act & Assert
         StepVerifier.create(capacidadUseCase.listarCapacidades(criteria))
                 .expectErrorMatches(e -> e instanceof BusinessException &&
                         ((BusinessException) e).getMessage().equals(TechnicalMessage.INVALID_PARAMETERS.getDescription()))
                 .verify();
+    }
+
+    @Test
+    void eliminarCapacidadesPorIds_exito() {
+        // Arrange
+        List<Long> ids = List.of(1L, 2L);
+        when(capacidadPersistencePort.deleteByIds(ids)).thenReturn(Mono.empty());
+
+        // Act & Assert
+        StepVerifier.create(capacidadUseCase.eliminarCapacidadesPorIds(ids))
+                .verifyComplete();
+    }
+
+    @Test
+    void validateCapacidadesExist_exito() {
+        // Arrange
+        List<Long> ids = List.of(1L, 2L);
+        when(capacidadPersistencePort.existsByIds(ids)).thenReturn(Mono.just(true));
+
+        // Act & Assert
+        StepVerifier.create(capacidadUseCase.validateCapacidadesExist(ids))
+                .expectNext(true)
+                .verifyComplete();
     }
 }

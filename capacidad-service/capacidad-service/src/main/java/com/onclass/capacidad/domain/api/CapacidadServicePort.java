@@ -13,4 +13,5 @@ public interface CapacidadServicePort {
     Mono<Capacidad> registrarCapacidad(Capacidad capacidad, String messageId);
     Mono<PageResult<CapacidadConTecnologias>> listarCapacidades(CapacidadCriteria criteria);
     Mono<Void> eliminarCapacidadesPorIds(List<Long> capacidadIds);
+    Mono<Boolean> validateCapacidadesExist(List<Long> capacidadIds);
 }

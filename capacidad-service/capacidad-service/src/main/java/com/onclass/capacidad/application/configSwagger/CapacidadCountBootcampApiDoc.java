@@ -12,13 +12,13 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @RouterOperation(
-        path = ApiConstants.PATH_CAPACIDAD + "/{capacidadId}/bootcamps/count",
+        path = ApiConstants.PATH_CAPACIDAD + ApiConstants.PATH_CAPACIDAD_ID_BOOTCAMPS_COUNT,
         beanClass = CapacidadBootcampHandlerImpl.class,
-        beanMethod = "countBootcampsByCapacidadId",
+        beanMethod = ApiConstants.COUNT_BOOTCAMPS_BY_CAPACIDAD_METHOD,
         operation = @Operation(
                 operationId = ApiConstants.COUNT_BOOTCAMPS_BY_CAPACIDAD_OPERATION_ID,
                 summary = ApiConstants.COUNT_BOOTCAMPS_BY_CAPACIDAD_SUMMARY,
-                description = "Retorna el número de bootcamps asociados a una capacidad específica.",
+                description = ApiConstants.COUNT_BOOTCAMPS_BY_CAPACIDAD_DESCRIPTION,
                 parameters = {
                         @Parameter(
                                 name = ApiConstants.HEADER_X_MESSAGE_ID,
@@ -27,9 +27,9 @@ import java.lang.annotation.RetentionPolicy;
                                 required = true
                         ),
                         @Parameter(
-                                name = "capacidadId",
+                                name = ApiConstants.PARAM_CAPACIDAD_ID,
                                 in = ParameterIn.PATH,
-                                description = "ID de la capacidad a consultar",
+                                description = ApiConstants.PARAM_CAPACIDAD_ID_DESC,
                                 required = true
                         )
                 },

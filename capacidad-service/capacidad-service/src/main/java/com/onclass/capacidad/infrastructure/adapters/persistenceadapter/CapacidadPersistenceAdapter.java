@@ -24,7 +24,12 @@ public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
     @Override
     public Mono<Capacidad> saveCapacidad(Capacidad capacidad) {
         return capacidadRepository.save(capacidadEntityMapper.toEntity(capacidad))
-                .map(capacidadEntityMapper::toModel);
+                .map(savedEntity -> new Capacidad(
+                        savedEntity.getId(),
+                        savedEntity.getNombre(),
+                        savedEntity.getDescripcion(),
+                        capacidad.tecnologias()
+                ));
     }
 
     @Override
@@ -62,5 +67,11 @@ public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
     @Override
     public Mono<Void> deleteByIds(List<Long> capacidadIds) {
         return capacidadRepository.deleteByIds(capacidadIds);
+    }
+
+    @Override
+    public Mono<Boolean> existsByIds(List<Long> capacidadIds) {
+        return capacidadRepository.countByIdIn(capacidadIds)
+                .map(count -> count == capacidadIds.size());
     }
 }

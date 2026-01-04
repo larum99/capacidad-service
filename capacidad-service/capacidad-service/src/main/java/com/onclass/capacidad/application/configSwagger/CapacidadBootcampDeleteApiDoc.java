@@ -12,14 +12,13 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @RouterOperation(
-        path = ApiConstants.PATH_CAPACIDAD_BOOTCAMP + "/{bootcampId}",
+        path = ApiConstants.PATH_CAPACIDAD_BOOTCAMP + ApiConstants.PATH_BOOTCAMP_ID,
         beanClass = CapacidadBootcampHandlerImpl.class,
-        beanMethod = "deleteCapacidadesByBootcamp",
+        beanMethod = ApiConstants.DELETE_CAPACIDADES_BY_BOOTCAMP_METHOD,
         operation = @Operation(
                 operationId = ApiConstants.DELETE_CAPACIDAD_BOOTCAMP_OPERATION_ID,
                 summary = ApiConstants.DELETE_CAPACIDAD_BOOTCAMP_SUMMARY,
-                description = "Elimina las capacidades asociadas a un bootcamp específico. " +
-                        "La operación es transaccional e ignora las capacidades compartidas con otros bootcamps.",
+                description = ApiConstants.DELETE_CAPACIDAD_BOOTCAMP_DESCRIPTION,
                 parameters = {
                         @Parameter(
                                 name = ApiConstants.HEADER_X_MESSAGE_ID,
@@ -28,9 +27,9 @@ import java.lang.annotation.RetentionPolicy;
                                 required = true
                         ),
                         @Parameter(
-                                name = "bootcampId",
+                                name = ApiConstants.PARAM_BOOTCAMP_ID,
                                 in = ParameterIn.PATH,
-                                description = "ID del bootcamp cuyas capacidades serán eliminadas",
+                                description = ApiConstants.PARAM_BOOTCAMP_ID_DESC,
                                 required = true
                         )
                 },

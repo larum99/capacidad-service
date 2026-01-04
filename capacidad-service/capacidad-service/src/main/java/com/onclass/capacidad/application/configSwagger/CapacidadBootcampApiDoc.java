@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 @RouterOperation(
         path = ApiConstants.PATH_CAPACIDAD_BOOTCAMP,
         beanClass = CapacidadBootcampHandlerImpl.class,
-        beanMethod = "createCapacidadBootcamps",
+        beanMethod = ApiConstants.CREATE_CAPACIDAD_BOOTCAMPS_METHOD,
         operation = @Operation(
                 operationId = ApiConstants.CREATE_CAPACIDAD_BOOTCAMP_OPERATION_ID,
                 summary = ApiConstants.CREATE_CAPACIDAD_BOOTCAMP_SUMMARY,
@@ -29,7 +29,7 @@ import java.lang.annotation.RetentionPolicy;
                                 in = ParameterIn.HEADER,
                                 description = ApiConstants.HEADER_X_MESSAGE_ID_DESC,
                                 required = true,
-                                schema = @Schema(type = "string")
+                                schema = @Schema(type = ApiConstants.SCHEMA_TYPE_STRING)
                         )
                 },
                 requestBody = @RequestBody(
@@ -39,7 +39,7 @@ import java.lang.annotation.RetentionPolicy;
                                 schema = @Schema(implementation = BootcampCapacidadDTO.class),
                                 examples = {
                                         @ExampleObject(
-                                                name = "Ejemplo CapacidadBootcamp",
+                                                name = ApiConstants.EXAMPLE_CAPACIDAD_BOOTCAMP_NAME,
                                                 value = ApiExamples.CAPACIDAD_BOOTCAMP_DTO_JSON
                                         )
                                 }
