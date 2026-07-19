@@ -2,14 +2,15 @@ server:
   port: 8090
 
 spring:
-  webflux:
-    base-path: /capacidad-service
+  sql:
+    init:
+      mode: always
   application:
     name: capacidad-service
   r2dbc:
     url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:capacidad}
     username: ${DB_USER:root}
-    password: ${DB_PASSWORD:Pragma08679}
+    password: ${DB_PASSWORD}
   main:
     web-application-type: reactive
 
@@ -68,7 +69,7 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 2
         automatic-transition-from-open-to-half-open-enabled: false
         record-exceptions: java.util.concurrent.TimeoutException
-        ignore-exceptions: com.onclass.tecnologia.capacidad.domain.exceptions.BusinessException
+        ignore-exceptions: com.onclass.capacidad.domain.exceptions.BusinessException
   retry:
     configs:
       default:
@@ -99,8 +100,6 @@ resilience4j:
 springdoc:
   api-docs:
     enabled: true
-  swagger-ui:
-    path: /swagger-ui.html
 
 services:
   tecnologia:
