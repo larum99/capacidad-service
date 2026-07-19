@@ -15,6 +15,15 @@ public final class ApiConstants {
     public static final String CREATE_CAPACIDAD_BOOTCAMP_SUMMARY = "Registrar la relación capacidad - bootcamp";
     public static final String GET_CAPACIDADES_OPERATION_ID = "getCapacidades";
     public static final String GET_CAPACIDADES_SUMMARY = "Obtener el listado de capacidades";
+    public static final String DELETE_CAPACIDAD_BOOTCAMP_OPERATION_ID = "deleteCapacidadesByBootcamp";
+    public static final String DELETE_CAPACIDAD_BOOTCAMP_SUMMARY = "Eliminar capacidades asociadas a un bootcamp";
+
+    public static final String COUNT_BOOTCAMPS_BY_CAPACIDAD_OPERATION_ID = "countBootcampsByCapacidadId";
+    public static final String COUNT_BOOTCAMPS_BY_CAPACIDAD_SUMMARY = "Contar bootcamps asociados a una capacidad";
+
+    public static final String DELETE_CAPACIDADES_BY_IDS_OPERATION_ID = "deleteCapacidadesByIds";
+    public static final String DELETE_CAPACIDADES_BY_IDS_SUMMARY = "Eliminar capacidades por lista de IDs";
+
 
     // Headers
     public static final String HEADER_X_MESSAGE_ID = "x-message-id";
@@ -29,6 +38,8 @@ public final class ApiConstants {
     public static final String HTTP_CREATED = "201";
     public static final String HTTP_BAD_REQUEST = "400";
     public static final String HTTP_INTERNAL_ERROR = "500";
+    public static final String HTTP_NO_CONTENT = "204";
+    public static final String HTTP_NOT_FOUND = "404";
 
     // Descripciones de respuesta
     public static final String RESPONSE_201 = "Capacidad creada exitosamente";
@@ -38,6 +49,8 @@ public final class ApiConstants {
     public static final String RESPONSE_CAPACIDAD_BOOTCAMP_400 = "Solicitud inválida para la relación capacidad - bootcamp";
     public static final String RESPONSE_CAPACIDAD_BOOTCAMP_500 = "Error interno del servidor al crear la relación capacidad - bootcamp";
     public static final String RESPONSE_200 = "Listado de capacidades devuelto correctamente";
+    public static final String RESPONSE_204 = "Capacidades eliminadas exitosamente.";
+    public static final String RESPONSE_404 = "No se encontraron capacidades asociadas al bootcamp indicado.";
 
     // Parámetros de consulta
     public static final String PARAM_PAGE = "page";

@@ -1,13 +1,13 @@
 package com.onclass.capacidad.domain.usecase;
 
 import com.onclass.capacidad.domain.api.CapacidadBootcampServicePort;
-import com.onclass.capacidad.domain.model.Capacidad;
 import com.onclass.capacidad.domain.model.CapacidadBootcamp;
+import com.onclass.capacidad.domain.model.CapacidadConTecnologias;
 import com.onclass.capacidad.domain.spi.CapacidadBootcampPersistencePort;
 import com.onclass.capacidad.domain.spi.TecnologiaClientPort;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadSummaryDTO;
-import org.springframework.stereotype.Service;
+import com.onclass.capacidad.domain.utils.TecnologiaSummary;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -29,19 +29,28 @@ public class CapacidadBootcampUseCase implements CapacidadBootcampServicePort {
     }
 
     @Override
-    public Flux<CapacidadSummaryDTO> listarCapacidadesPorBootcamp(Long bootcampId) {
+    public Flux<CapacidadConTecnologias> listarCapacidadesPorBootcamp(Long bootcampId) {
         return persistencePort.findCapacidadesByBootcampId(bootcampId)
-                .flatMap(capacidad ->
+                .concatMap(capacidad ->
                         tecnologiaClientPort.findTecnologiasByCapacidadId(capacidad.id())
+                                .map(t -> new TecnologiaSummary(t.getId(), t.getNombre()))
                                 .collectList()
-                                .map(tecnologias ->
-                                        new CapacidadSummaryDTO(
-                                                capacidad.id(),
-                                                capacidad.nombre(),
-                                                tecnologias
-                                        )
-                                )
+                                .map(tecnologias -> new CapacidadConTecnologias(
+                                        capacidad.id(),
+                                        capacidad.nombre(),
+                                        capacidad.descripcion(),
+                                        tecnologias
+                                ))
                 );
     }
 
+    @Override
+    public Mono<List<Long>> eliminarCapacidadesPorBootcamp(Long bootcampId, String messageId) {
+        return persistencePort.deleteByBootcampId(bootcampId);
+    }
+
+    @Override
+    public Mono<Integer> countBootcampsByCapacidadId(Long capacidadId) {
+        return persistencePort.countBootcampsByCapacidadId(capacidadId);
+    }
 }

@@ -12,6 +12,7 @@ import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
 import com.onclass.capacidad.infrastructure.entrypoints.util.ErrorDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -72,6 +73,19 @@ public class CapacidadHandlerImpl {
                 .flatMap(pageResult -> ServerResponse.ok().bodyValue(pageResult))
                 .onErrorResume(ex -> handleErrors(ex, messageId))
                 .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId));
+    }
+
+    public Mono<ServerResponse> deleteCapacidadesByIds(ServerRequest request) {
+        String messageId = getMessageId(request);
+
+        return request.bodyToMono(new ParameterizedTypeReference<List<Long>>() {})
+                .flatMap(capacidadIds -> {
+                    log.info("Petición para eliminar capacidades con IDs: {}", capacidadIds);
+                    return capacidadServicePort.eliminarCapacidadesPorIds(capacidadIds)
+                            .then(ServerResponse.noContent().build());
+                })
+                .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
+                .onErrorResume(ex -> handleErrors(ex, messageId));
     }
 
     private Mono<ServerResponse> handleErrors(Throwable ex, String messageId) {

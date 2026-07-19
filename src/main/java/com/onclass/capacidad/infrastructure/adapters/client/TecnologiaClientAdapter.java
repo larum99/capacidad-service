@@ -1,6 +1,7 @@
 package com.onclass.capacidad.infrastructure.adapters.client;
 
 import com.onclass.capacidad.domain.spi.TecnologiaClientPort;
+import com.onclass.capacidad.domain.utils.TecnologiaSummary;
 import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadTecnologiaDTO;
 import com.onclass.capacidad.infrastructure.entrypoints.dto.TecnologiaSummaryDTO;
 import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
@@ -40,13 +41,14 @@ public class TecnologiaClientAdapter implements TecnologiaClientPort {
     }
 
     @Override
-    public Flux<TecnologiaSummaryDTO> findTecnologiasByCapacidadId(Long capacidadId) {
+    public Flux<TecnologiaSummary> findTecnologiasByCapacidadId(Long capacidadId) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/capacidad-tecnologias/{id}/tecnologias")
                         .build(capacidadId))
                 .header(Constants.X_MESSAGE_ID, "12345")
                 .retrieve()
-                .bodyToFlux(TecnologiaSummaryDTO.class);
+                .bodyToFlux(TecnologiaSummaryDTO.class)
+                .map(dto -> new TecnologiaSummary(dto.id(), dto.nombre()));
     }
 }

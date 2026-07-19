@@ -6,8 +6,9 @@ import com.onclass.capacidad.domain.spi.CapacidadPersistencePort;
 import com.onclass.capacidad.domain.utils.PageResult;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.mapper.CapacidadEntityMapper;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.repository.CapacidadRepository;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadListDTO;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
 
@@ -29,25 +30,25 @@ public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
     @Override
     public Mono<Boolean> existByNombre(String nombre) {
         return capacidadRepository.findByNombre(nombre)
-                .map(capacidadEntityMapper::toModel)
-                .map(c -> true)
+                .map(entity -> true)
                 .defaultIfEmpty(false);
     }
 
     @Override
-    public Mono<PageResult<CapacidadListDTO>> findAll(CapacidadCriteria criteria) {
+    public Mono<PageResult<Capacidad>> findAll(CapacidadCriteria criteria) {
         return capacidadRepository.findAllByFilters(criteria)
-                .map(capacidadEntityMapper::toListDTO)
+                .map(capacidadEntityMapper::toModel)
                 .collectList()
                 .zipWith(capacidadRepository.countByFilters(criteria))
                 .map(tuple -> {
+                    List<Capacidad> content = tuple.getT1();
                     long totalElements = tuple.getT2();
                     int totalPages = (int) Math.ceil((double) totalElements / criteria.getSize());
                     boolean isFirst = criteria.getPage() == 0;
                     boolean isLast = criteria.getPage() == totalPages - 1;
 
                     return new PageResult<>(
-                            tuple.getT1(),
+                            content,
                             totalElements,
                             totalPages,
                             criteria.getPage(),
@@ -56,5 +57,10 @@ public class CapacidadPersistenceAdapter implements CapacidadPersistencePort {
                             isLast
                     );
                 });
+    }
+
+    @Override
+    public Mono<Void> deleteByIds(List<Long> capacidadIds) {
+        return capacidadRepository.deleteByIds(capacidadIds);
     }
 }

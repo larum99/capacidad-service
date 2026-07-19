@@ -42,8 +42,12 @@ public class UseCasesConfig {
 
     @Bean
     public CapacidadBootcampServicePort capacidadBootcampServicePort(
-            CapacidadBootcampPersistencePort persistencePort,
+            CapacidadBootcampPersistencePort capacidadBootcampPersistencePort,
             TecnologiaClientPort tecnologiaClientPort) {
-        return new CapacidadBootcampUseCase(persistencePort, tecnologiaClientPort);
+
+        return new CapacidadBootcampUseCase(
+                capacidadBootcampPersistencePort,
+                tecnologiaClientPort
+        );
     }
 }

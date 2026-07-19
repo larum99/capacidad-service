@@ -1,12 +1,14 @@
 package com.onclass.capacidad.infrastructure.adapters.persistenceadapter;
 
+import com.onclass.capacidad.domain.model.Capacidad;
 import com.onclass.capacidad.domain.model.CapacidadBootcamp;
 import com.onclass.capacidad.domain.spi.CapacidadBootcampPersistencePort;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.mapper.CapacidadBootcampEntityMapper;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.repository.CapacidadBootcampRepository;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadSummaryDTO;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 public class CapacidadBootcampPersistenceAdapter implements CapacidadBootcampPersistencePort {
 
@@ -26,7 +28,39 @@ public class CapacidadBootcampPersistenceAdapter implements CapacidadBootcampPer
     }
 
     @Override
-    public Flux<CapacidadSummaryDTO> findCapacidadesByBootcampId(Long bootcampId) {
-        return repository.findCapacidadesByBootcampId(bootcampId);
+    public Flux<Capacidad> findCapacidadesByBootcampId(Long bootcampId) {
+        return repository.findCapacidadesByBootcampId(bootcampId)
+                .map(entity -> new Capacidad(
+                        entity.getId(),
+                        entity.getNombre(),
+                        entity.getDescripcion(),
+                        null
+                ));
+    }
+
+    @Override
+    public Mono<List<CapacidadBootcamp>> findCapacidadesBootcampByBootcampId(Long bootcampId) {
+        return repository.findByBootcampId(bootcampId)
+                .map(mapper::toModel)
+                .collectList();
+    }
+
+    @Override
+    public Mono<Integer> countBootcampsByCapacidadId(Long capacidadId) {
+        return repository.countByCapacidadId(capacidadId)
+                .map(Long::intValue);
+    }
+
+    @Override
+    public Mono<List<Long>> deleteByBootcampId(Long bootcampId) {
+        return repository.findCapacidadIdsByBootcampId(bootcampId)
+                .collectList()
+                .flatMap(capacidadIds -> {
+                    if (capacidadIds.isEmpty()) {
+                        return Mono.just(capacidadIds);
+                    }
+                    return repository.deleteAllByBootcampId(bootcampId)
+                            .thenReturn(capacidadIds);
+                });
     }
 }
