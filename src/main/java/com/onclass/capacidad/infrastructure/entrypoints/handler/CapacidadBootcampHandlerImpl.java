@@ -9,11 +9,14 @@ import com.onclass.capacidad.infrastructure.entrypoints.mapper.CapacidadBootcamp
 import com.onclass.capacidad.infrastructure.entrypoints.util.APIResponse;
 import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
 import com.onclass.capacidad.infrastructure.entrypoints.util.ErrorDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,6 +25,8 @@ import java.util.UUID;
 
 @Component
 public class CapacidadBootcampHandlerImpl {
+
+    private static final Logger log = LoggerFactory.getLogger(CapacidadBootcampHandlerImpl.class);
 
     private final CapacidadBootcampServicePort servicePort;
     private final CapacidadBootcampMapper mapper;
@@ -41,6 +46,19 @@ public class CapacidadBootcampHandlerImpl {
                 .flatMapMany(list -> servicePort.registrarCapacidadBootcamps(list, messageId))
                 .collectList()
                 .flatMap(saved -> ServerResponse.status(HttpStatus.CREATED).bodyValue(saved));
+    }
+
+    public Mono<ServerResponse> listCapacidadesByBootcamp(ServerRequest request) {
+        String messageId = getMessageId(request);
+        Long bootcampId = Long.valueOf(request.pathVariable("bootcampId"));
+
+        return servicePort
+                .listarCapacidadesPorBootcamp(bootcampId)
+                .collectList()
+                .flatMap(list -> ServerResponse.ok().bodyValue(list))
+                .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
+                .doOnError(ex -> log.error("Error al listar capacidades para bootcamp {}", bootcampId, ex))
+                .onErrorResume(ex -> buildErrorResponse(messageId, ex));
     }
 
     private Mono<ServerResponse> buildErrorResponse(String messageId, Throwable ex) {

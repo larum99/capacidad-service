@@ -157,7 +157,7 @@ class CapacidadUseCaseTest {
 
         StepVerifier.create(capacidadUseCase.listarCapacidades(criteria))
                 .expectErrorMatches(e -> e instanceof BusinessException &&
-                        ((BusinessException) e).getMessage().equals(TechnicalMessage.INVALID_SORT_BY_PARAM.getDescription()))
+                        ((BusinessException) e).getMessage().equals(TechnicalMessage.INVALID_PARAMETERS.getDescription()))
                 .verify();
     }
 }

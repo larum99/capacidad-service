@@ -78,7 +78,7 @@ public class CapacidadUseCase implements CapacidadServicePort {
             case Constants.SORT_BY_CANTIDAD_TECNOLOGIAS:
                 return sortByTechnologyCount(criteria);
             default:
-                return Mono.error(new BusinessException(TechnicalMessage.INVALID_SORT_BY_PARAM));
+                return Mono.error(new BusinessException(TechnicalMessage.INVALID_PARAMETERS));
         }
     }
 

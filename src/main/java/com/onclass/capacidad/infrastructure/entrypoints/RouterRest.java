@@ -1,8 +1,6 @@
 package com.onclass.capacidad.infrastructure.entrypoints;
 
-import com.onclass.capacidad.application.configSwagger.CapacidadApiDoc;
-import com.onclass.capacidad.application.configSwagger.CapacidadBootcampApiDoc;
-import com.onclass.capacidad.application.configSwagger.CapacidadGetApiDoc;
+import com.onclass.capacidad.application.configSwagger.*;
 import com.onclass.capacidad.infrastructure.entrypoints.handler.CapacidadBootcampHandlerImpl;
 import com.onclass.capacidad.infrastructure.entrypoints.handler.CapacidadHandlerImpl;
 import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
@@ -37,5 +35,12 @@ public class RouterRest {
         return route()
                 .POST(Constants.CAPACIDAD_BOOTCAMP_PATH, handler::createCapacidadBootcamps)
                 .build();
+    }
+
+    @Bean
+    @CapacidadBootcampGetApiDoc
+    public RouterFunction<ServerResponse> getCapacidadesByBootcamp(CapacidadBootcampHandlerImpl handler) {
+        return route(GET(ApiConstants.PATH_CAPACIDAD_BOOTCAMP + "/{bootcampId}/capacidades"),
+                handler::listCapacidadesByBootcamp);
     }
 }
