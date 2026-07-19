@@ -4,7 +4,7 @@ import com.onclass.capacidad.domain.api.CapacidadBootcampServicePort;
 import com.onclass.capacidad.domain.enums.TechnicalMessage;
 import com.onclass.capacidad.domain.exceptions.BusinessException;
 import com.onclass.capacidad.domain.exceptions.TechnicalException;
-import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadBootcampDTO;
+import com.onclass.capacidad.infrastructure.entrypoints.dto.BootcampCapacidadDTO;
 import com.onclass.capacidad.infrastructure.entrypoints.mapper.CapacidadBootcampMapper;
 import com.onclass.capacidad.infrastructure.entrypoints.util.APIResponse;
 import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
@@ -35,7 +35,7 @@ public class CapacidadBootcampHandlerImpl {
     public Mono<ServerResponse> createCapacidadBootcamps(ServerRequest request) {
         String messageId = UUID.randomUUID().toString();
 
-        return request.bodyToFlux(CapacidadBootcampDTO.class)
+        return request.bodyToFlux(BootcampCapacidadDTO.class)
                 .map(mapper::toModel)
                 .collectList()
                 .flatMapMany(list -> servicePort.registrarCapacidadBootcamps(list, messageId))

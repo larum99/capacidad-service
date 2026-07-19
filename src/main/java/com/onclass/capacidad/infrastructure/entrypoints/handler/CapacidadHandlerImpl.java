@@ -1,6 +1,7 @@
 package com.onclass.capacidad.infrastructure.entrypoints.handler;
 
 import com.onclass.capacidad.domain.api.CapacidadServicePort;
+import com.onclass.capacidad.domain.criteria.CapacidadCriteria;
 import com.onclass.capacidad.domain.enums.TechnicalMessage;
 import com.onclass.capacidad.domain.exceptions.BusinessException;
 import com.onclass.capacidad.domain.exceptions.TechnicalException;
@@ -41,49 +42,73 @@ public class CapacidadHandlerImpl {
         String messageId = getMessageId(request);
 
         return request.bodyToMono(CapacidadDTO.class)
-                .flatMap(dto -> {
-                    // Convertimos DTO a modelo y delegamos al UseCase
-                    return capacidadServicePort
-                            .registrarCapacidad(capacidadMapper.toModel(dto), messageId)
-                            .doOnSuccess(saved -> log.info("Capacidad creada con messageId: {}", messageId));
-                })
+                .flatMap(dto -> capacidadServicePort
+                        .registrarCapacidad(capacidadMapper.toModel(dto), messageId)
+                        .doOnSuccess(saved -> log.info("Capacidad creada con messageId: {}", messageId)))
                 .flatMap(saved -> ServerResponse
                         .status(HttpStatus.CREATED)
                         .bodyValue(TechnicalMessage.CAPACIDAD_CREATED.getDescription()))
                 .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
                 .doOnError(ex -> log.error(Constants.CAPACIDAD_ERROR, ex))
-                .onErrorResume(BusinessException.class, ex -> buildErrorResponse(
-                        HttpStatus.BAD_REQUEST,
-                        messageId,
-                        ex.getTechnicalMessage(),
-                        List.of(ErrorDTO.builder()
-                                .code(ex.getTechnicalMessage().getCode())
-                                .message(ex.getTechnicalMessage().getDescription())
-                                .param(ex.getTechnicalMessage().getParam())
-                                .build())
-                ))
-                .onErrorResume(TechnicalException.class, ex -> buildErrorResponse(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        messageId,
-                        ex.getTechnicalMessage(),
-                        List.of(ErrorDTO.builder()
-                                .code(ex.getTechnicalMessage().getCode())
-                                .message(ex.getTechnicalMessage().getDescription())
-                                .param(ex.getTechnicalMessage().getParam())
-                                .build())
-                ))
-                .onErrorResume(ex -> {
-                    log.error("Unexpected error with messageId: {}", messageId, ex);
-                    return buildErrorResponse(
-                            HttpStatus.INTERNAL_SERVER_ERROR,
-                            messageId,
-                            TechnicalMessage.INTERNAL_ERROR,
-                            List.of(ErrorDTO.builder()
-                                    .code(TechnicalMessage.INTERNAL_ERROR.getCode())
-                                    .message(TechnicalMessage.INTERNAL_ERROR.getDescription())
-                                    .build())
-                    );
-                });
+                .onErrorResume(ex -> handleErrors(ex, messageId));
+    }
+
+    public Mono<ServerResponse> getCapacidades(ServerRequest request) {
+        String messageId = getMessageId(request);
+
+        int page = parseQueryParam(request, "page", 0);
+        int size = parseQueryParam(request, "size", 10);
+        String sortBy = request.queryParam("sortBy").orElse("nombre");
+
+        String sortOrder = request.queryParam("sortOrder").orElse("asc");
+
+        CapacidadCriteria criteria = new CapacidadCriteria();
+        criteria.setPage(page);
+        criteria.setSize(size);
+        criteria.setSortBy(sortBy);
+        criteria.setSortOrder(sortOrder);
+
+        return capacidadServicePort.listarCapacidades(criteria)
+                .flatMap(pageResult -> ServerResponse.ok().bodyValue(pageResult))
+                .onErrorResume(ex -> handleErrors(ex, messageId))
+                .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId));
+    }
+
+    private Mono<ServerResponse> handleErrors(Throwable ex, String messageId) {
+        log.error("Error procesando solicitud con messageId: {}", messageId, ex);
+
+        if (ex instanceof BusinessException businessEx) {
+            return buildErrorResponse(
+                    HttpStatus.BAD_REQUEST,
+                    messageId,
+                    businessEx.getTechnicalMessage(),
+                    List.of(ErrorDTO.builder()
+                            .code(businessEx.getTechnicalMessage().getCode())
+                            .message(businessEx.getTechnicalMessage().getDescription())
+                            .param(businessEx.getTechnicalMessage().getParam())
+                            .build()));
+        }
+
+        if (ex instanceof TechnicalException techEx) {
+            return buildErrorResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    messageId,
+                    techEx.getTechnicalMessage(),
+                    List.of(ErrorDTO.builder()
+                            .code(techEx.getTechnicalMessage().getCode())
+                            .message(techEx.getTechnicalMessage().getDescription())
+                            .param(techEx.getTechnicalMessage().getParam())
+                            .build()));
+        }
+
+        return buildErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                messageId,
+                TechnicalMessage.INTERNAL_ERROR,
+                List.of(ErrorDTO.builder()
+                        .code(TechnicalMessage.INTERNAL_ERROR.getCode())
+                        .message(TechnicalMessage.INTERNAL_ERROR.getDescription())
+                        .build()));
     }
 
     private Mono<ServerResponse> buildErrorResponse(HttpStatus httpStatus, String identifier,
@@ -101,5 +126,11 @@ public class CapacidadHandlerImpl {
     private String getMessageId(ServerRequest serverRequest) {
         return Optional.ofNullable(serverRequest.headers().firstHeader(Constants.X_MESSAGE_ID))
                 .orElse(UUID.randomUUID().toString());
+    }
+
+    private int parseQueryParam(ServerRequest request, String name, int defaultValue) {
+        return request.queryParam(name)
+                .map(Integer::parseInt)
+                .orElse(defaultValue);
     }
 }

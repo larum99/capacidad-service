@@ -8,7 +8,6 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-@Service
 public class CapacidadBootcampUseCase implements CapacidadBootcampServicePort {
 
     private final CapacidadBootcampPersistencePort persistencePort;

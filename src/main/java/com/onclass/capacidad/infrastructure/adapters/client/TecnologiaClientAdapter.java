@@ -1,14 +1,16 @@
 package com.onclass.capacidad.infrastructure.adapters.client;
 
 import com.onclass.capacidad.domain.spi.TecnologiaClientPort;
+import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadTecnologiaDTO;
+import com.onclass.capacidad.infrastructure.entrypoints.dto.TecnologiaSummaryDTO;
 import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class TecnologiaClientAdapter implements TecnologiaClientPort {
@@ -24,17 +26,27 @@ public class TecnologiaClientAdapter implements TecnologiaClientPort {
 
     @Override
     public Mono<Void> associateCapacidadWithTecnologias(Long capacidadId, List<Long> tecnologiasIds) {
-        List<CapacidadTecnologiaDTO> dtos = tecnologiasIds.stream()
+        return Flux.fromIterable(tecnologiasIds)
                 .map(techId -> new CapacidadTecnologiaDTO(capacidadId, techId))
-                .collect(Collectors.toList());
-
-        return webClient.post()
-                .uri("/capacidad-tecnologias")
-                .header(Constants.X_MESSAGE_ID, "12345")
-                .bodyValue(dtos)
-                .retrieve()
-                .bodyToMono(Void.class);
+                .collectList()
+                .flatMap(dtos ->
+                        webClient.post()
+                                .uri("/capacidad-tecnologias")
+                                .header(Constants.X_MESSAGE_ID, "12345")
+                                .bodyValue(dtos)
+                                .retrieve()
+                                .bodyToMono(Void.class)
+                );
     }
 
-    public record CapacidadTecnologiaDTO(Long capacidadId, Long tecnologiaId) {}
+    @Override
+    public Flux<TecnologiaSummaryDTO> findTecnologiasByCapacidadId(Long capacidadId) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/capacidad-tecnologias/{id}/tecnologias")
+                        .build(capacidadId))
+                .header(Constants.X_MESSAGE_ID, "12345")
+                .retrieve()
+                .bodyToFlux(TecnologiaSummaryDTO.class);
+    }
 }

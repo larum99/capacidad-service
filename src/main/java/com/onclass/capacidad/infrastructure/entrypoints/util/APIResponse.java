@@ -14,9 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class APIResponse {
-    private String code;       // Código de respuesta
-    private String message;    // Mensaje global
-    private String identifier; // messageId
-    private String date;       // Fecha
-    private List<ErrorDTO> errors; // Lista de errores
+    private String code;
+    private String message;
+    private String identifier;
+    private String date;
+    private List<ErrorDTO> errors;
 }
