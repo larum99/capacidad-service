@@ -14,11 +14,11 @@ import java.lang.annotation.RetentionPolicy;
 @RouterOperation(
         path = ApiConstants.PATH_CAPACIDAD,
         beanClass = CapacidadHandlerImpl.class,
-        beanMethod = "getCapacidades",
+        beanMethod = ApiConstants.GET_CAPACIDADES_METHOD,
         operation = @Operation(
                 operationId = ApiConstants.GET_CAPACIDADES_OPERATION_ID,
                 summary = ApiConstants.GET_CAPACIDADES_SUMMARY,
-                description = "Obtiene todas las capacidades paginadas. Se pueden incluir parámetros opcionales de paginación y ordenamiento.",
+                description = ApiConstants.GET_CAPACIDADES_DESCRIPTION,
                 parameters = {
                         @Parameter(
                                 name = ApiConstants.HEADER_X_MESSAGE_ID,

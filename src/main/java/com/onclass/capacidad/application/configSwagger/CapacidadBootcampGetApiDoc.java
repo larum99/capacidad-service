@@ -12,13 +12,13 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @RouterOperation(
-        path = ApiConstants.PATH_CAPACIDAD_BOOTCAMP + "/{bootcampId}/capacidades",
+        path = ApiConstants.PATH_CAPACIDAD_BOOTCAMP + ApiConstants.PATH_BOOTCAMP_ID + ApiConstants.PATH_CAPACIDADES,
         beanClass = CapacidadBootcampHandlerImpl.class,
-        beanMethod = "listCapacidadesByBootcamp",
+        beanMethod = ApiConstants.LIST_CAPACIDADES_BY_BOOTCAMP_METHOD,
         operation = @Operation(
-                operationId = "getCapacidadesByBootcamp",
-                summary = "Obtiene todas las capacidades asociadas a un bootcamp",
-                description = "Retorna todas las capacidades que están asociadas a un bootcamp específico según su ID.",
+                operationId = ApiConstants.GET_CAPACIDADES_BY_BOOTCAMP_OPERATION_ID,
+                summary = ApiConstants.GET_CAPACIDADES_BY_BOOTCAMP_SUMMARY,
+                description = ApiConstants.GET_CAPACIDADES_BY_BOOTCAMP_DESCRIPTION,
                 parameters = {
                         @Parameter(
                                 name = ApiConstants.HEADER_X_MESSAGE_ID,
@@ -27,9 +27,9 @@ import java.lang.annotation.RetentionPolicy;
                                 required = true
                         ),
                         @Parameter(
-                                name = "bootcampId",
+                                name = ApiConstants.PARAM_BOOTCAMP_ID,
                                 in = ParameterIn.PATH,
-                                description = "ID del bootcamp",
+                                description = ApiConstants.PARAM_BOOTCAMP_ID_DESC_SIMPLE,
                                 required = true
                         )
                 },

@@ -7,7 +7,9 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table(name = "capacidades")
+import static com.onclass.capacidad.infrastructure.adapters.persistenceadapter.util.EntityConstants.TABLE_CAPACIDADES;
+
+@Table(name = TABLE_CAPACIDADES)
 @Getter
 @Setter
 @RequiredArgsConstructor

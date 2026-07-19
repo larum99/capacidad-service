@@ -12,4 +12,5 @@ public interface CapacidadPersistencePort {
     Mono<Boolean> existByNombre(String nombre);
     Mono<PageResult<Capacidad>> findAll(CapacidadCriteria criteria);
     Mono<Void> deleteByIds(List<Long> capacidadIds);
+    Mono<Boolean> existsByIds(List<Long> capacidadIds);
 }

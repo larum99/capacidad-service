@@ -8,4 +8,10 @@ public class Constants {
     public static final String CAPACIDAD_ERROR = "Error en Capacidad - [ERROR]";
     public static final String CAPACIDAD_PATH = "/capacidades";
     public static final String CAPACIDAD_BOOTCAMP_PATH = "/capacidad-bootcamps";
+    
+    // Router paths
+    public static final String ROUTER_PATH_BOOTCAMP_ID_CAPACIDADES = "/{bootcampId}/capacidades";
+    public static final String ROUTER_PATH_BOOTCAMP_ID = "/{bootcampId}";
+    public static final String ROUTER_PATH_CAPACIDAD_ID_BOOTCAMPS_COUNT = "/{capacidadId}/bootcamps/count";
+    public static final String ROUTER_PATH_VALIDATE = "/validate";
 }

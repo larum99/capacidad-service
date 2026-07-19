@@ -31,17 +31,31 @@ public class CapacidadBootcampUseCase implements CapacidadBootcampServicePort {
     @Override
     public Flux<CapacidadConTecnologias> listarCapacidadesPorBootcamp(Long bootcampId) {
         return persistencePort.findCapacidadesByBootcampId(bootcampId)
-                .concatMap(capacidad ->
-                        tecnologiaClientPort.findTecnologiasByCapacidadId(capacidad.id())
-                                .map(t -> new TecnologiaSummary(t.getId(), t.getNombre()))
-                                .collectList()
-                                .map(tecnologias -> new CapacidadConTecnologias(
-                                        capacidad.id(),
-                                        capacidad.nombre(),
-                                        capacidad.descripcion(),
-                                        tecnologias
-                                ))
-                );
+                .concatMap(this::enriquecerCapacidadConTecnologias);
+    }
+
+    private Mono<CapacidadConTecnologias> enriquecerCapacidadConTecnologias(com.onclass.capacidad.domain.model.Capacidad capacidad) {
+        return obtenerTecnologiasDeCapacidad(capacidad.id())
+                .map(tecnologias -> crearCapacidadConTecnologias(capacidad, tecnologias));
+    }
+
+    private Mono<List<TecnologiaSummary>> obtenerTecnologiasDeCapacidad(Long capacidadId) {
+        return tecnologiaClientPort.findTecnologiasByCapacidadId(capacidadId)
+                .map(this::convertirATecnologiaSummary)
+                .collectList();
+    }
+
+    private TecnologiaSummary convertirATecnologiaSummary(com.onclass.capacidad.domain.utils.TecnologiaSummary tecnologia) {
+        return new TecnologiaSummary(tecnologia.getId(), tecnologia.getNombre());
+    }
+
+    private CapacidadConTecnologias crearCapacidadConTecnologias(com.onclass.capacidad.domain.model.Capacidad capacidad, List<TecnologiaSummary> tecnologias) {
+        return new CapacidadConTecnologias(
+                capacidad.id(),
+                capacidad.nombre(),
+                capacidad.descripcion(),
+                tecnologias
+        );
     }
 
     @Override

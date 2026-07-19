@@ -17,4 +17,6 @@ public final class ApiExamples {
         "bootcampId": 2
     }
     """;
+
+    public static final String DELETE_IDS_JSON = "[1, 2, 3]";
 }

@@ -9,6 +9,7 @@ import com.onclass.capacidad.infrastructure.entrypoints.mapper.CapacidadBootcamp
 import com.onclass.capacidad.infrastructure.entrypoints.util.APIResponse;
 import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
 import com.onclass.capacidad.infrastructure.entrypoints.util.ErrorDTO;
+import com.onclass.capacidad.infrastructure.entrypoints.util.HandlerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -50,38 +51,38 @@ public class CapacidadBootcampHandlerImpl {
 
     public Mono<ServerResponse> listCapacidadesByBootcamp(ServerRequest request) {
         String messageId = getMessageId(request);
-        Long bootcampId = Long.valueOf(request.pathVariable("bootcampId"));
+        Long bootcampId = Long.valueOf(request.pathVariable(HandlerConstants.PATH_VARIABLE_BOOTCAMP_ID));
 
         return servicePort
                 .listarCapacidadesPorBootcamp(bootcampId)
                 .collectList()
                 .flatMap(list -> ServerResponse.ok().bodyValue(list))
                 .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
-                .doOnError(ex -> log.error("Error al listar capacidades para bootcamp {}", bootcampId, ex))
+                .doOnError(ex -> log.error(HandlerConstants.LOG_ERROR_LISTAR_CAPACIDADES, bootcampId, ex))
                 .onErrorResume(ex -> buildErrorResponse(messageId, ex));
     }
 
     public Mono<ServerResponse> deleteCapacidadesByBootcamp(ServerRequest request) {
         String messageId = getMessageId(request);
-        Long bootcampId = Long.valueOf(request.pathVariable("bootcampId"));
+        Long bootcampId = Long.valueOf(request.pathVariable(HandlerConstants.PATH_VARIABLE_BOOTCAMP_ID));
 
         return servicePort
                 .eliminarCapacidadesPorBootcamp(bootcampId, messageId)
                 .then(ServerResponse.noContent().build())
                 .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
-                .doOnSuccess(r -> log.info("Capacidades eliminadas para bootcamp {}", bootcampId))
-                .doOnError(ex -> log.error("Error al eliminar capacidades del bootcamp {}", bootcampId, ex))
+                .doOnSuccess(r -> log.info(HandlerConstants.LOG_INFO_CAPACIDADES_ELIMINADAS, bootcampId))
+                .doOnError(ex -> log.error(HandlerConstants.LOG_ERROR_ELIMINAR_CAPACIDADES, bootcampId, ex))
                 .onErrorResume(ex -> buildErrorResponse(messageId, ex));
     }
 
     public Mono<ServerResponse> countBootcampsByCapacidadId(ServerRequest request) {
         String messageId = getMessageId(request);
-        Long capacidadId = Long.valueOf(request.pathVariable("capacidadId"));
+        Long capacidadId = Long.valueOf(request.pathVariable(HandlerConstants.PATH_VARIABLE_CAPACIDAD_ID));
 
         return servicePort.countBootcampsByCapacidadId(capacidadId)
                 .flatMap(count -> ServerResponse.ok().bodyValue(count))
                 .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
-                .doOnError(ex -> log.error("Error al contar bootcamps para capacidad {}: {}", capacidadId, ex.getMessage()))
+                .doOnError(ex -> log.error(HandlerConstants.LOG_ERROR_CONTAR_BOOTCAMPS, capacidadId, ex.getMessage()))
                 .onErrorResume(ex -> buildErrorResponse(messageId, ex));
     }
 

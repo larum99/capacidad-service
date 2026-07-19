@@ -2,6 +2,7 @@ package com.onclass.capacidad.infrastructure.adapters.client;
 
 import com.onclass.capacidad.domain.spi.TecnologiaClientPort;
 import com.onclass.capacidad.domain.utils.TecnologiaSummary;
+import com.onclass.capacidad.infrastructure.adapters.util.ClientConstants;
 import com.onclass.capacidad.infrastructure.entrypoints.dto.CapacidadTecnologiaDTO;
 import com.onclass.capacidad.infrastructure.entrypoints.dto.TecnologiaSummaryDTO;
 import com.onclass.capacidad.infrastructure.entrypoints.util.Constants;
@@ -19,7 +20,7 @@ public class TecnologiaClientAdapter implements TecnologiaClientPort {
     private final WebClient webClient;
 
     public TecnologiaClientAdapter(WebClient.Builder webClientBuilder,
-                                   @Value("${services.tecnologia.url}") String tecnologiaUrl) {
+                                   @Value(ClientConstants.TECNOLOGIA_SERVICE_URL_PROPERTY) String tecnologiaUrl) {
         this.webClient = webClientBuilder
                 .baseUrl(tecnologiaUrl)
                 .build();
@@ -32,8 +33,8 @@ public class TecnologiaClientAdapter implements TecnologiaClientPort {
                 .collectList()
                 .flatMap(dtos ->
                         webClient.post()
-                                .uri("/capacidad-tecnologias")
-                                .header(Constants.X_MESSAGE_ID, "12345")
+                                .uri(ClientConstants.URI_CAPACIDAD_TECNOLOGIAS)
+                                .header(Constants.X_MESSAGE_ID, ClientConstants.DEFAULT_MESSAGE_ID)
                                 .bodyValue(dtos)
                                 .retrieve()
                                 .bodyToMono(Void.class)
@@ -44,9 +45,9 @@ public class TecnologiaClientAdapter implements TecnologiaClientPort {
     public Flux<TecnologiaSummary> findTecnologiasByCapacidadId(Long capacidadId) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/capacidad-tecnologias/{id}/tecnologias")
+                        .path(ClientConstants.URI_CAPACIDAD_TECNOLOGIAS_BY_ID)
                         .build(capacidadId))
-                .header(Constants.X_MESSAGE_ID, "12345")
+                .header(Constants.X_MESSAGE_ID, ClientConstants.DEFAULT_MESSAGE_ID)
                 .retrieve()
                 .bodyToFlux(TecnologiaSummaryDTO.class)
                 .map(dto -> new TecnologiaSummary(dto.id(), dto.nombre()));

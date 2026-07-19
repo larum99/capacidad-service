@@ -39,21 +39,21 @@ public class RouterRest {
     @Bean
     @CapacidadBootcampGetApiDoc
     public RouterFunction<ServerResponse> getCapacidadesByBootcamp(CapacidadBootcampHandlerImpl handler) {
-        return route(GET(ApiConstants.PATH_CAPACIDAD_BOOTCAMP + "/{bootcampId}/capacidades"),
+        return route(GET(ApiConstants.PATH_CAPACIDAD_BOOTCAMP + Constants.ROUTER_PATH_BOOTCAMP_ID_CAPACIDADES),
                 handler::listCapacidadesByBootcamp);
     }
 
     @Bean
     @CapacidadBootcampDeleteApiDoc
     public RouterFunction<ServerResponse> deleteCapacidadesByBootcamp(CapacidadBootcampHandlerImpl handler) {
-        return route(DELETE(ApiConstants.PATH_CAPACIDAD_BOOTCAMP + "/{bootcampId}"),
+        return route(DELETE(ApiConstants.PATH_CAPACIDAD_BOOTCAMP + Constants.ROUTER_PATH_BOOTCAMP_ID),
                 handler::deleteCapacidadesByBootcamp);
     }
 
     @Bean
     @CapacidadCountBootcampApiDoc
     public RouterFunction<ServerResponse> countBootcampsByCapacidadRoute(CapacidadBootcampHandlerImpl handler) {
-        return route(GET(Constants.CAPACIDAD_PATH + "/{capacidadId}/bootcamps/count"),
+        return route(GET(Constants.CAPACIDAD_PATH + Constants.ROUTER_PATH_CAPACIDAD_ID_BOOTCAMPS_COUNT),
                 handler::countBootcampsByCapacidadId);
     }
 
@@ -62,5 +62,11 @@ public class RouterRest {
     public RouterFunction<ServerResponse> deleteCapacidadesByIdsRoute(CapacidadHandlerImpl handler) {
         return route(DELETE(Constants.CAPACIDAD_PATH),
                 handler::deleteCapacidadesByIds);
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> validateCapacidadesRoute(CapacidadHandlerImpl handler) {
+        return route(POST(Constants.CAPACIDAD_PATH + Constants.ROUTER_PATH_VALIDATE),
+                handler::validateCapacidadesExist);
     }
 }

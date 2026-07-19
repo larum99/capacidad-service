@@ -46,9 +46,18 @@ public class CapacidadHandlerImpl {
                 .flatMap(dto -> capacidadServicePort
                         .registrarCapacidad(capacidadMapper.toModel(dto), messageId)
                         .doOnSuccess(saved -> log.info("Capacidad creada con messageId: {}", messageId)))
-                .flatMap(saved -> ServerResponse
-                        .status(HttpStatus.CREATED)
-                        .bodyValue(TechnicalMessage.CAPACIDAD_CREATED.getDescription()))
+                .flatMap(saved -> {
+                    APIResponse successResponse = APIResponse.builder()
+                            .code(TechnicalMessage.CAPACIDAD_CREATED.getCode())
+                            .message(TechnicalMessage.CAPACIDAD_CREATED.getDescription())
+                            .identifier(messageId)
+                            .date(Instant.now().toString())
+                            .data(capacidadMapper.toDTO(saved))
+                            .build();
+                    return ServerResponse
+                            .status(HttpStatus.CREATED)
+                            .bodyValue(successResponse);
+                })
                 .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
                 .doOnError(ex -> log.error(Constants.CAPACIDAD_ERROR, ex))
                 .onErrorResume(ex -> handleErrors(ex, messageId));
@@ -84,6 +93,18 @@ public class CapacidadHandlerImpl {
                     return capacidadServicePort.eliminarCapacidadesPorIds(capacidadIds)
                             .then(ServerResponse.noContent().build());
                 })
+                .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
+                .onErrorResume(ex -> handleErrors(ex, messageId));
+    }
+
+    public Mono<ServerResponse> validateCapacidadesExist(ServerRequest request) {
+        String messageId = getMessageId(request);
+
+        return request.bodyToMono(new ParameterizedTypeReference<List<Long>>() {})
+                .flatMap(capacidadIds -> 
+                    capacidadServicePort.validateCapacidadesExist(capacidadIds)
+                            .flatMap(allExist -> ServerResponse.ok().bodyValue(allExist))
+                )
                 .contextWrite(Context.of(Constants.X_MESSAGE_ID, messageId))
                 .onErrorResume(ex -> handleErrors(ex, messageId));
     }

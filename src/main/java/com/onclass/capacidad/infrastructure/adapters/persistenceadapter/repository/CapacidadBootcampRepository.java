@@ -2,6 +2,7 @@ package com.onclass.capacidad.infrastructure.adapters.persistenceadapter.reposit
 
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.entity.CapacidadBootcampEntity;
 import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.entity.CapacidadEntity;
+import com.onclass.capacidad.infrastructure.adapters.persistenceadapter.util.QueryConstants;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -20,18 +21,13 @@ public interface CapacidadBootcampRepository extends ReactiveCrudRepository<Capa
 
     Mono<Void> deleteByBootcampIdAndCapacidadId(Long bootcampId, Long capacidadId);
 
-    @Query("""
-    SELECT c.id AS id, c.nombre AS nombre, c.descripcion AS descripcion
-    FROM capacidad_bootcamp cb
-    JOIN capacidades c ON cb.id_capacidad = c.id
-    WHERE cb.id_bootcamp = :bootcampId
-    """)
+    @Query(QueryConstants.FIND_CAPACIDADES_BY_BOOTCAMP_ID)
     Flux<CapacidadEntity> findCapacidadesByBootcampId(Long bootcampId);
 
-    @Query("SELECT id_capacidad FROM capacidad_bootcamp WHERE id_bootcamp = :bootcampId")
+    @Query(QueryConstants.FIND_CAPACIDAD_IDS_BY_BOOTCAMP_ID)
     Flux<Long> findCapacidadIdsByBootcampId(Long bootcampId);
 
     @Modifying
-    @Query("DELETE FROM capacidad_bootcamp WHERE id_bootcamp = :bootcampId")
+    @Query(QueryConstants.DELETE_ALL_BY_BOOTCAMP_ID)
     Mono<Void> deleteAllByBootcampId(Long bootcampId);
 }

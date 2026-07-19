@@ -19,7 +19,7 @@ import java.lang.annotation.RetentionPolicy;
 @RouterOperation(
         path = ApiConstants.PATH_CAPACIDAD,
         beanClass = CapacidadHandlerImpl.class,
-        beanMethod = "createCapacidad",
+        beanMethod = ApiConstants.CREATE_CAPACIDAD_METHOD,
         operation = @Operation(
                 operationId = ApiConstants.CREATE_CAPACIDAD_OPERATION_ID,
                 summary = ApiConstants.CREATE_CAPACIDAD_SUMMARY,
@@ -29,7 +29,7 @@ import java.lang.annotation.RetentionPolicy;
                                 in = ParameterIn.HEADER,
                                 description = ApiConstants.HEADER_X_MESSAGE_ID_DESC,
                                 required = true,
-                                schema = @Schema(type = "string")
+                                schema = @Schema(type = ApiConstants.SCHEMA_TYPE_STRING)
                         )
                 },
                 requestBody = @RequestBody(
@@ -39,7 +39,7 @@ import java.lang.annotation.RetentionPolicy;
                                 schema = @Schema(implementation = CapacidadDTO.class),
                                 examples = {
                                         @ExampleObject(
-                                                name = "Ejemplo Capacidad",
+                                                name = ApiConstants.EXAMPLE_CAPACIDAD_NAME,
                                                 value = ApiExamples.CAPACIDAD_DTO_JSON
                                         )
                                 }

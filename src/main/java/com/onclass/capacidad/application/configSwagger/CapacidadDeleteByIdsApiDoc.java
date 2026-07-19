@@ -19,11 +19,11 @@ import java.util.List;
 @RouterOperation(
         path = ApiConstants.PATH_CAPACIDAD,
         beanClass = CapacidadHandlerImpl.class,
-        beanMethod = "deleteCapacidadesByIds",
+        beanMethod = ApiConstants.DELETE_CAPACIDADES_BY_IDS_METHOD,
         operation = @Operation(
                 operationId = ApiConstants.DELETE_CAPACIDADES_BY_IDS_OPERATION_ID,
                 summary = ApiConstants.DELETE_CAPACIDADES_BY_IDS_SUMMARY,
-                description = "Elimina varias capacidades según una lista de IDs enviados en el cuerpo de la solicitud.",
+                description = ApiConstants.DELETE_CAPACIDADES_BY_IDS_DESCRIPTION,
                 parameters = {
                         @Parameter(
                                 name = ApiConstants.HEADER_X_MESSAGE_ID,
@@ -34,13 +34,13 @@ import java.util.List;
                 },
                 requestBody = @RequestBody(
                         required = true,
-                        description = "Lista de IDs de capacidades a eliminar",
+                        description = ApiConstants.REQUEST_BODY_DELETE_IDS_DESCRIPTION,
                         content = @Content(
                                 schema = @Schema(implementation = List.class),
                                 examples = {
                                         @ExampleObject(
-                                                name = "Ejemplo eliminación por IDs",
-                                                value = "[1, 2, 3]"
+                                                name = ApiConstants.EXAMPLE_DELETE_IDS_NAME,
+                                                value = ApiExamples.DELETE_IDS_JSON
                                         )
                                 }
                         )
